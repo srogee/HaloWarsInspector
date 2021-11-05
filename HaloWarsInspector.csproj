@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ColorHelper" Version="1.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="HaloWarsTools">
+      <HintPath>..\HaloWarsTools\bin\Debug\net5.0\HaloWarsTools.dll</HintPath>
+    </Reference>
+    <Reference Include="KSoft">
+      <HintPath>..\HaloWarsDocs\PhxTools\_bin\v160\Debug\AnyCPU\Phoenix\KSoft.dll</HintPath>
+    </Reference>
+    <Reference Include="KSoft.Phoenix">
+      <HintPath>..\HaloWarsDocs\PhxTools\_bin\v160\Debug\AnyCPU\Phoenix\KSoft.Phoenix.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="MapControl - Copy - Copy.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>MapControl - Copy.xaml.cs</DependentUpon>
+    </Compile>
+    <Compile Update="MapControl - Copy.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>MapControl.xaml.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

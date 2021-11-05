@@ -1,0 +1,29 @@
+﻿<Window x:Class="HaloWarsInspector.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HaloWarsInspector"
+        mc:Ignorable="d"
+        Title="Halo Wars Inspector" Height="1080" Width="1920">
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom" Height="30">
+            <StatusBarItem>
+                <TextBlock Name="lblStatus" />
+            </StatusBarItem>
+        </StatusBar>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="450"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <GridSplitter HorizontalAlignment="Right" 
+                      VerticalAlignment="Stretch" 
+                      Grid.Column="1" ResizeBehavior="PreviousAndNext"
+                      Width="2"/>
+            <TreeView Name="myTreeView" Grid.Column="0"/>
+            <UserControl Name="myControlDockPanel" Grid.Column="2"></UserControl>
+        </Grid>
+    </DockPanel>
+</Window>

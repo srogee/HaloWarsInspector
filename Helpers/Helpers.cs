@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Media3D;
+using HaloWarsTools;
 
 namespace HaloWarsInspector
 {
@@ -43,6 +44,10 @@ namespace HaloWarsInspector
                     ExpandBounds(child, ref bounds, ref assigned);
                 }
             }
+        }
+
+        public void GetOrCreateOpenGLScene(GenericMesh mesh) {
+
         }
     }
 }

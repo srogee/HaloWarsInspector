@@ -16,8 +16,6 @@ namespace HaloWarsInspector.Rendering
         private int _vertexBufferObject;
         private int _vertexArrayObject;
         private int indicesLength;
-        private static Shader _shader;
-        private static Texture _texture;
 
         public Model(List<Vector3> vertices, List<Vector3> normals, List<Vector2> texCoords, IEnumerable<int> indices) {
             var data = new List<float>();
@@ -58,39 +56,26 @@ namespace HaloWarsInspector.Rendering
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
 
-            // shader.vert has been modified. Take a look at it after the explanation in OnRenderFrame.
-            if (_shader == null) {
-                _shader = new Shader("Rendering/Shaders/shader.vert", "Rendering/Shaders/shader.frag");
-                _shader.Use();
-            }
+            var shader = ShaderCompiler.DefaultShader;
+            shader.Use();
 
-            if (_texture == null) {
-                _texture = Texture.LoadFromFile("Rendering/Resources/container.png");
-                _texture.Use(TextureUnit.Texture0);
-            }
-
-            _shader.SetInt("texture0", 0);
-
-            var positionLocation = _shader.GetAttribLocation("aPosition");
+            var positionLocation = shader.GetAttribLocation("aPosition");
             GL.EnableVertexAttribArray(positionLocation);
             // Remember to change the stride as we now have 6 floats per vertex
             GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
 
             // We now need to define the layout of the normal so the shader can use it
-            var normalLocation = _shader.GetAttribLocation("aNormal");
+            var normalLocation = shader.GetAttribLocation("aNormal");
             GL.EnableVertexAttribArray(normalLocation);
             GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 3 * sizeof(float));
 
-            var texCoordLocation = _shader.GetAttribLocation("aTexCoord");
+            var texCoordLocation = shader.GetAttribLocation("aTexCoord");
             GL.EnableVertexAttribArray(texCoordLocation);
             GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
         }
 
         public void Draw(Matrix4 model, Matrix4 view, Matrix4 projection) {
             GL.BindVertexArray(_vertexArrayObject);
-
-            _texture.Use(TextureUnit.Texture0);
-            _shader.Use();
 
             // Then, we pass all of these matrices to the vertex shader.
             // You could also multiply them here and then pass, which is faster, but having the separate matrices available is used for some advanced effects.
@@ -101,9 +86,11 @@ namespace HaloWarsInspector.Rendering
             // If you pass the individual matrices to the shader and multiply there, you have to do in the order "model * view * projection".
             // You can think like this: first apply the modelToWorld (aka model) matrix, then apply the worldToView (aka view) matrix, 
             // and finally apply the viewToProjectedSpace (aka projection) matrix.
-            _shader.SetMatrix4("model", model);
-            _shader.SetMatrix4("view", view);
-            _shader.SetMatrix4("projection", projection);
+            var shader = ShaderCompiler.DefaultShader;
+            shader.Use();
+            shader.SetMatrix4("model", model);
+            shader.SetMatrix4("view", view);
+            shader.SetMatrix4("projection", projection);
 
             GL.DrawElements(PrimitiveType.Triangles, indicesLength, DrawElementsType.UnsignedInt, 0);
         }

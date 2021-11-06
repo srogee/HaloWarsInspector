@@ -11,6 +11,7 @@ namespace LearnOpenTK.Common
     public class Shader
     {
         public readonly int Handle;
+        public Texture Texture;
 
         private readonly Dictionary<string, int> _uniformLocations;
 
@@ -111,6 +112,7 @@ namespace LearnOpenTK.Common
 
         // A wrapper function that enables the shader program.
         public void Use() {
+            Texture?.Use(TextureUnit.Texture0);
             GL.UseProgram(Handle);
         }
 

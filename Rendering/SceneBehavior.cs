@@ -33,7 +33,7 @@ namespace HaloWarsInspector.Rendering
         }
 
         public void Render() {
-            GL.ClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+            GL.ClearColor(1f, 1f, 1f, 1f);
 
             // We enable depth testing here. If you try to draw something more complex than one plane without this,
             // you'll notice that polygons further in the background will occasionally be drawn over the top of the ones in the foreground.

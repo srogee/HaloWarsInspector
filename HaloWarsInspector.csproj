@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="ColorHelper" Version="1.6.0" />
+    <PackageReference Include="OpenTK" Version="4.6.7" />
+    <PackageReference Include="OpenTK.GLWpfControl" Version="4.1.0" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,14 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="MapControl - Copy - Copy.xaml.cs">
-      <SubType>Code</SubType>
-      <DependentUpon>MapControl - Copy.xaml.cs</DependentUpon>
-    </Compile>
-    <Compile Update="MapControl - Copy.xaml.cs">
-      <SubType>Code</SubType>
-      <DependentUpon>MapControl.xaml.cs</DependentUpon>
-    </Compile>
+    <None Include="Rendering/Shaders/**" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Rendering/Resources/**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

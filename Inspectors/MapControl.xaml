@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="HaloWarsInspector.VisualControl"
+﻿<UserControl x:Class="HaloWarsInspector.MapControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,10 +8,10 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <TabControl VerticalAlignment="Stretch">
-            <TabItem Header="Visual Viewer" Name="myVisualViewerTab" VerticalAlignment="Stretch">
+            <TabItem Header="Map Viewer" Name="myMapViewerTab" VerticalAlignment="Stretch">
                 <Viewport3D Name="viewport3D1">
                     <Viewport3D.Camera>
-                        <PerspectiveCamera x:Name="camMain" Position="100 100 100" LookDirection="-1 -1 -1">
+                        <PerspectiveCamera x:Name="camMain" Position="3000 3000 3000" LookDirection="-1 -1 -1">
                         </PerspectiveCamera>
                     </Viewport3D.Camera>
                     <ModelVisual3D>
@@ -21,6 +21,13 @@
                         </ModelVisual3D.Content>
                     </ModelVisual3D>
                     <ModelVisual3D x:Name="myScene">
+                        <ModelVisual3D.Transform>
+                            <RotateTransform3D>
+                                <RotateTransform3D.Rotation>
+                                    <AxisAngleRotation3D x:Name="myAngleRotation" Axis="1,0,0" Angle="-90" />
+                                </RotateTransform3D.Rotation>
+                            </RotateTransform3D>
+                        </ModelVisual3D.Transform>
                         <ModelVisual3D.Content>
                             <GeometryModel3D>
                                 <GeometryModel3D.Geometry>

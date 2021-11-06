@@ -23,6 +23,7 @@ namespace HaloWarsInspector
 
             myScene.Children.Clear();
             myScene.Children.Add(resource.Mesh.ToModelVisual3d());
+            Helpers.SetupCamera(this, viewport3D1, camMain);
         }
     }
 }

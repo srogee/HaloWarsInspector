@@ -22,6 +22,7 @@ namespace HaloWarsInspector
             foreach (var model in resource.Models) {
                 myScene.Children.Add(model.Resource.Mesh.ToModelVisual3d());
             }
+            Helpers.SetupCamera(this, viewport3D1, camMain);
         }
     }
 }

@@ -16,8 +16,8 @@ namespace HaloWarsInspector.Rendering
         private int _vertexBufferObject;
         private int _vertexArrayObject;
         private int indicesLength;
-        private Shader _shader;
-        private Texture _texture;
+        private static Shader _shader;
+        private static Texture _texture;
 
         public Model(List<Vector3> vertices, List<Vector3> normals, List<Vector2> texCoords, IEnumerable<int> indices) {
             var data = new List<float>();
@@ -59,8 +59,17 @@ namespace HaloWarsInspector.Rendering
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
 
             // shader.vert has been modified. Take a look at it after the explanation in OnRenderFrame.
-            _shader = new Shader("Rendering/Shaders/shader.vert", "Rendering/Shaders/shader.frag");
-            _shader.Use();
+            if (_shader == null) {
+                _shader = new Shader("Rendering/Shaders/shader.vert", "Rendering/Shaders/shader.frag");
+                _shader.Use();
+            }
+
+            if (_texture == null) {
+                _texture = Texture.LoadFromFile("Rendering/Resources/container.png");
+                _texture.Use(TextureUnit.Texture0);
+            }
+
+            _shader.SetInt("texture0", 0);
 
             var positionLocation = _shader.GetAttribLocation("aPosition");
             GL.EnableVertexAttribArray(positionLocation);
@@ -75,11 +84,6 @@ namespace HaloWarsInspector.Rendering
             var texCoordLocation = _shader.GetAttribLocation("aTexCoord");
             GL.EnableVertexAttribArray(texCoordLocation);
             GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
-
-            _texture = Texture.LoadFromFile("Rendering/Resources/container.png");
-            _texture.Use(TextureUnit.Texture0);
-
-            _shader.SetInt("texture0", 0);
         }
 
         public void Draw(Matrix4 model, Matrix4 view, Matrix4 projection) {

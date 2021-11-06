@@ -11,7 +11,6 @@
             <TabItem Header="Model Viewer" Name="myModelViewerTab" VerticalAlignment="Stretch">
                 <glWpfControl:GLWpfControl 
                     x:Name="OpenTkControl"
-                    Loaded="OpenTkControl_Loaded"
                     Render="OpenTkControl_OnRender"/>
             </TabItem>
         </TabControl>

@@ -45,8 +45,6 @@ namespace HaloWarsInspector
             AddAllFilesOfTypeToTree("Models", artPath, "*.ugx");
 
             lblStatus.Text = "Ready";
-
-            myControlDockPanel.Content = new ModelControl(null);
         }
 
         private void AddAllFilesOfTypeToTree(string topLevelFolderName, string startIn, string searchPattern) {

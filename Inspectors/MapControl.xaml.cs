@@ -4,6 +4,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using System.IO;
 using HaloWarsTools;
+using HaloWarsInspector.Rendering;
 
 namespace HaloWarsInspector
 {
@@ -12,18 +13,22 @@ namespace HaloWarsInspector
     /// </summary>
     public partial class MapControl : UserControl
     {
+        private SceneBehavior scene;
+
         public MapControl(object dataContext) {
             InitializeComponent();
 
+            scene = new SceneBehavior(OpenTkControl);
+
             DataContext = dataContext;
-
             var hwDataContext = DataContext as HWDataContext;
-            myMapViewerTab.Header = "Map Viewer - " + Path.GetFileNameWithoutExtension(hwDataContext.RelativePath);
-            var resource = HWXtdResource.FromFile(hwDataContext.Context, Path.ChangeExtension(hwDataContext.RelativePath, null));
-
-            myScene.Children.Clear();
-            myScene.Children.Add(resource.Mesh.ToModelVisual3d());
-            Helpers.SetupCamera(this, viewport3D1, camMain);
+            if (hwDataContext != null) {
+                myMapViewerTab.Header = "Map Viewer - " + Path.GetFileNameWithoutExtension(hwDataContext.RelativePath);
+                var resource = HWXtdResource.FromFile(hwDataContext.Context, Path.ChangeExtension(hwDataContext.RelativePath, null));
+                scene.Root.Children.Add(SceneNode.FromGenericMesh(resource.Mesh));
+            }
         }
+
+        private void OpenTkControl_OnRender(TimeSpan delta) => scene.TickAndRender(delta);
     }
 }

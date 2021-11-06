@@ -10,7 +10,7 @@ using OpenTK.Mathematics;
 
 namespace HaloWarsInspector.Rendering
 {
-    class Model
+    public class Model
     {
         private int _elementBufferObject;
         private int _vertexBufferObject;
@@ -19,7 +19,7 @@ namespace HaloWarsInspector.Rendering
         private Shader _shader;
         private Texture _texture;
 
-        public Model(List<System.Numerics.Vector3> vertices, List<System.Numerics.Vector3> normals, List<System.Numerics.Vector2> texCoords, IEnumerable<int> indices) {
+        public Model(List<Vector3> vertices, List<Vector3> normals, List<Vector2> texCoords, IEnumerable<int> indices) {
             var data = new List<float>();
             
             for (int i = 0; i < vertices.Count; i++) {

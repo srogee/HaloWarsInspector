@@ -14,3 +14,15 @@ Some Folder
     HaloWarsInspector
 ```
 * Build and run the solution
+
+## To-do List
+* Read/import resources on separate thread so process isn't locked up
+* Compile shaders on separate thread
+* Allow users to toggle visibility of different meshes/submeshes
+* Center terrain mesh in map viewer
+* Rotate meshes to match expected +X forward +Z up
+* Automatically set camera position based on scene bounds
+* Add orbit and fly camera controls
+* Add texture support (blocked by HaloWarsTools)
+* Add material/shader support (blocked by HaloWarsTools)
+* Discard GL vertex buffers/shaders/textures when they're no longer needed

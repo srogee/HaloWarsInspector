@@ -15,65 +15,77 @@ namespace HaloWarsInspector.Rendering
         private int _elementBufferObject;
         private int _vertexBufferObject;
         private int _vertexArrayObject;
-        private uint[] _indices;
+        private int indicesLength;
         private Shader _shader;
         private Texture _texture;
-        private Texture _texture2;
 
-        public Model(GenericMesh mesh) {
-            float[] _vertices =
-            {
-                // Position         Texture coordinates
-                 0.5f,  0.5f, 0.0f, 1.0f, 1.0f, // top right
-                 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // bottom right
-                -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
-                -0.5f,  0.5f, 0.0f, 0.0f, 1.0f  // top left
-            };
+        public Model(List<System.Numerics.Vector3> vertices, List<System.Numerics.Vector3> normals, List<System.Numerics.Vector2> texCoords, IEnumerable<int> indices) {
+            var data = new List<float>();
+            
+            for (int i = 0; i < vertices.Count; i++) {
+                data.Add(vertices[i].X);
+                data.Add(vertices[i].Y);
+                data.Add(vertices[i].Z);
 
-            _indices = new uint[]
-            {
-                0, 1, 3,
-                1, 2, 3
-            };
+                data.Add(normals[i].X);
+                data.Add(normals[i].Y);
+                data.Add(normals[i].Z);
+
+                data.Add(texCoords[i].X);
+                data.Add(texCoords[i].Y);
+            }
+
+            var uintIndices = indices.Select(index => (uint)index);
+
+            Initialize(data.ToArray(), uintIndices.ToArray());
+        }
+
+        public Model(float[] data, uint[] indices) {
+            Initialize(data.ToArray(), indices.ToArray()); // Makes a copy
+        }
+
+        private void Initialize(float[] data, uint[] indices) {
+            indicesLength = indices.Length;
 
             _vertexArrayObject = GL.GenVertexArray();
             GL.BindVertexArray(_vertexArrayObject);
 
             _vertexBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, data.Length * sizeof(float), data, BufferUsageHint.StaticDraw);
 
             _elementBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
 
             // shader.vert has been modified. Take a look at it after the explanation in OnRenderFrame.
             _shader = new Shader("Rendering/Shaders/shader.vert", "Rendering/Shaders/shader.frag");
             _shader.Use();
 
-            var vertexLocation = _shader.GetAttribLocation("aPosition");
-            GL.EnableVertexAttribArray(vertexLocation);
-            GL.VertexAttribPointer(vertexLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 0);
+            var positionLocation = _shader.GetAttribLocation("aPosition");
+            GL.EnableVertexAttribArray(positionLocation);
+            // Remember to change the stride as we now have 6 floats per vertex
+            GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
+
+            // We now need to define the layout of the normal so the shader can use it
+            var normalLocation = _shader.GetAttribLocation("aNormal");
+            GL.EnableVertexAttribArray(normalLocation);
+            GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 3 * sizeof(float));
 
             var texCoordLocation = _shader.GetAttribLocation("aTexCoord");
             GL.EnableVertexAttribArray(texCoordLocation);
-            GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float));
+            GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
 
             _texture = Texture.LoadFromFile("Rendering/Resources/container.png");
             _texture.Use(TextureUnit.Texture0);
 
-            _texture2 = Texture.LoadFromFile("Rendering/Resources/awesomeface.png");
-            _texture2.Use(TextureUnit.Texture1);
-
             _shader.SetInt("texture0", 0);
-            _shader.SetInt("texture1", 1);
         }
 
         public void Draw(Matrix4 model, Matrix4 view, Matrix4 projection) {
             GL.BindVertexArray(_vertexArrayObject);
 
             _texture.Use(TextureUnit.Texture0);
-            _texture2.Use(TextureUnit.Texture1);
             _shader.Use();
 
             // Then, we pass all of these matrices to the vertex shader.
@@ -89,7 +101,7 @@ namespace HaloWarsInspector.Rendering
             _shader.SetMatrix4("view", view);
             _shader.SetMatrix4("projection", projection);
 
-            GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, indicesLength, DrawElementsType.UnsignedInt, 0);
         }
     }
 }

@@ -4,6 +4,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using HaloWarsInspector.Rendering;
+using System.Linq;
 
 namespace HaloWarsInspector
 {
@@ -51,8 +52,55 @@ namespace HaloWarsInspector
             // Obviously, we don't want this, so we enable depth testing. We also clear the depth buffer in GL.Clear over in OnRenderFrame.
             GL.Enable(EnableCap.DepthTest);
 
+            float[] data = new float[] {
+                 // Position          Normal
+                -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0f, 0f, // Front face
+                 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1f, 0f,
+                 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1f, 1f,
+                 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1f, 1f,
+                -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0f, 1f,
+                -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0f, 0f,
+
+                -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0f, 0f, // Back face
+                 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1f, 0f,
+                 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1f, 1f,
+                 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1f, 1f,
+                -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0f, 1f,
+                -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0f, 0f,
+
+                -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1f, 1f, // Left face
+                -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 1f, 0f,
+                -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0f, 0f,
+                -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0f, 0f,
+                -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 0f, 1f,
+                -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1f, 1f,
+
+                 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 1f, 1f, // Right face
+                 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 1f, 0f,
+                 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0f, 0f,
+                 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0f, 0f,
+                 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0f, 1f,
+                 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 1f, 1f,
+
+                -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0f, 0f, // Bottom face
+                 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 1f, 0f,
+                 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 1f, 1f,
+                 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 1f, 1f,
+                -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 0f, 1f,
+                -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0f, 0f,
+
+                -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0f, 0f, // Top face
+                 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 1f, 0f,
+                 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1f, 1f,
+                 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1f, 1f,
+                -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0f, 1f,
+                -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0f, 0f,
+            };
+
+            uint[] indices = Enumerable.Range(0, 36).Select(number => (uint)number).ToArray();
+
             // Now, head over to OnRenderFrame to see how we setup the model matrix.
-            _model = new Model(null);
+            _model = new Model(data, indices);
         }
 
         private void OpenTkControl_OnRender(TimeSpan delta) {
@@ -77,9 +125,6 @@ namespace HaloWarsInspector
             var projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), (float)OpenTkControl.RenderSize.Width / (float)OpenTkControl.RenderSize.Height, 0.1f, 100.0f);
 
             var model = Matrix4.Identity * Matrix4.CreateRotationX((float)MathHelper.DegreesToRadians(_time));
-            _model.Draw(model, view, projection);
-
-            model = Matrix4.Identity* Matrix4.CreateRotationX(-(float)MathHelper.DegreesToRadians(_time));
             _model.Draw(model, view, projection);
         }
     }

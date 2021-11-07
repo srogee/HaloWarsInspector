@@ -33,7 +33,7 @@ namespace HaloWarsInspector
         private const string imageLibraryPath = "C:\\Users\\rid3r\\Documents\\GitHub\\VS2019 Image Library\\vswin2019";
         private HWContext context;
         public static MainWindow Instance;
-        private HashSet<string> extensions = new HashSet<string>() { ".xtd", ".vis", ".ugx" };
+        private HashSet<string> extensions = new HashSet<string>() { ".xtd", ".vis" };
 
         public MainWindow() {
             Instance = this;
@@ -109,14 +109,7 @@ namespace HaloWarsInspector
             }
 
             foreach (var file in filesInDirectory) {
-                var treeViewItem = new TreeViewItem() {
-                    Header = CreateIconAndLabel("ThreeDScene", Path.GetFileName(file)),
-                    HorizontalContentAlignment = HorizontalAlignment.Left,
-                    VerticalContentAlignment = VerticalAlignment.Center
-                };
-                treeViewItem.DataContext = new HWDataContext(context, context.GetRelativeScratchPath(file));
-                treeViewItem.Selected += FileItem_Selected;
-                collection.Add(treeViewItem);
+                collection.Add(CreateFileTreeViewItem(new HWDataContext(context, context.GetRelativeScratchPath(file))));
             }
 
             ResetStatus();
@@ -129,6 +122,24 @@ namespace HaloWarsInspector
             e.Handled = true;
         }
 
+        private TreeViewItem CreateFileTreeViewItem(HWDataContext dataContext) {
+            string extension = Path.GetExtension(dataContext.RelativePath).ToLowerInvariant();
+            string icon = extension switch {
+                ".xtd" => "MountainChart",
+                ".vis" => "ThreeDScene",
+                _ => "Question"
+            };
+            var treeViewItem = new TreeViewItem() {
+                Header = CreateIconAndLabel(icon, Path.GetFileName(dataContext.RelativePath)),
+                HorizontalContentAlignment = HorizontalAlignment.Left,
+                VerticalContentAlignment = VerticalAlignment.Center
+            };
+            treeViewItem.DataContext = dataContext;
+            treeViewItem.Selected += FileItem_Selected;
+
+            return treeViewItem;
+        }
+
         private TreeViewItem CreateLoadingTreeViewItem() {
             var loadingItem = new TreeViewItem() {
                 Header = CreateIconAndLabel("Hourglass", "Loading..."),
@@ -137,16 +148,16 @@ namespace HaloWarsInspector
             };
 
             return loadingItem;
+            //MountainChart
         }
 
         public void FileItem_Selected(object sender, RoutedEventArgs e) {
             var treeViewItem = sender as TreeViewItem;
             var dataContext = treeViewItem?.DataContext as HWDataContext;
             if (dataContext != null) {
-                var extension = Path.GetExtension(dataContext.RelativePath);
+                var extension = Path.GetExtension(dataContext.RelativePath).ToLowerInvariant();
                 myControlDockPanel.Content = extension switch {
                     ".xtd" => new MapControl(dataContext),
-                    ".ugx" => new ModelControl(dataContext),
                     ".vis" => new VisualControl(dataContext),
                     _ => null
                 };

@@ -17,56 +17,10 @@ namespace HaloWarsInspector
     public class HWDataContext {
         public string RelativePath;
         public HWContext Context;
-    }
 
-    public class HWTreeEntry
-    {
-        public TreeViewItem TreeViewItem;
-
-        public virtual void CreateTreeViewItem(MainWindow window) {
-        }
-    }
-
-    public class HWTreeFolder : HWTreeEntry
-    {
-        public List<HWTreeEntry> FilesAndFolders;
-        public string DisplayName;
-        public bool IsExpanded;
-
-        public HWTreeFolder(string displayName, bool isExpanded) {
-            FilesAndFolders = new List<HWTreeEntry>();
-            DisplayName = displayName;
-            IsExpanded = isExpanded;
-        }
-
-        public override void CreateTreeViewItem(MainWindow window) {
-            TreeViewItem = new TreeViewItem() {
-                Header = MainWindow.CreateIconAndLabel("FolderClosed", DisplayName),
-                HorizontalContentAlignment = HorizontalAlignment.Left,
-                VerticalContentAlignment = VerticalAlignment.Center
-            };
-            TreeViewItem.IsExpanded = IsExpanded;
-        }
-    }
-
-    public class HWTreeFile : HWTreeEntry
-    {
-        public HWDataContext Context;
-        public string DisplayName;
-
-        public HWTreeFile(string displayName, HWDataContext context) {
+        public HWDataContext(HWContext context, string relativePath) {
             Context = context;
-            DisplayName = displayName;
-        }
-
-        public override void CreateTreeViewItem(MainWindow window) {
-            TreeViewItem = new TreeViewItem() {
-                Header = MainWindow.CreateIconAndLabel("ThreeDScene", DisplayName),
-                HorizontalContentAlignment = HorizontalAlignment.Left,
-                VerticalContentAlignment = VerticalAlignment.Center
-            };
-            TreeViewItem.DataContext = Context;
-            TreeViewItem.Selected += window.FileItem_Selected;
+            RelativePath = relativePath;
         }
     }
 
@@ -76,15 +30,27 @@ namespace HaloWarsInspector
     public partial class MainWindow : Window
     {
         private HWContext context;
+        public static MainWindow Instance;
+        private HashSet<string> extensions = new HashSet<string>() { ".scn", ".vis", ".ugx" };
 
         public MainWindow() {
+            Instance = this;
             InitializeComponent();
             Initialize();
         }
 
-        private async void Initialize() {
-            lblStatus.Text = "Searching for game install directory...";
+        public void SetStatus(string label) {
+            lblStatus.Text = label;
             statusProgressBar.Visibility = Visibility.Visible;
+        }
+
+        public void ResetStatus() {
+            lblStatus.Text = "Ready";
+            statusProgressBar.Visibility = Visibility.Hidden;
+        }
+
+        private async void Initialize() {
+            SetStatus("Searching for game install directory...");
             string gameInstallDirectory = await Task.Run(() => SteamInterop.GetGameInstallDirectory("HaloWarsDE"));
             if (string.IsNullOrEmpty(gameInstallDirectory)) {
                 MessageBox.Show("Halo Wars Definitive Edition install directory could not be located.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -96,69 +62,81 @@ namespace HaloWarsInspector
             string scratchDirectory = "C:\\Users\\rid3r\\Documents\\HaloWarsTools\\scratch";
             context = new HWContext(gameInstallDirectory, scratchDirectory);
 
-            lblStatus.Text = "Expanding ERA files...";
+            SetStatus("Expanding ERA files...");
             await Task.Run(() => context.ExpandAllEraFiles());
 
-            lblStatus.Text = "Discovering game files...";
-            string scenarioPath = Path.Combine(context.ScratchDirectory, "scenario");
-            string artPath = Path.Combine(context.ScratchDirectory, "art");
-            var root = new HWTreeFolder("root", true);
+            PopulateTreeViewFolder(myTreeView.Items, "");
+
+            ResetStatus();
+        }
+
+        private bool DoesDirectoryHaveRelevantFiles(string absolutePath) {
+            return Directory.EnumerateFiles(absolutePath, "*.*", SearchOption.AllDirectories).Where(file => extensions.Contains(Path.GetExtension(file).ToLowerInvariant())).Any();
+        }
+
+        private async void PopulateTreeViewFolder(ItemCollection collection, string relativePath) {
+            collection.Clear();
+            collection.Add(CreateLoadingTreeViewItem());
+
+            SetStatus("Discovering game files...");
+            string[] filesInDirectory = null;
+            string[] foldersInDirectory = null;
+
             await Task.Run(() => {
-                AddAllFilesOfTypeToTree(root, "Maps", scenarioPath, "*.scn");
-                AddAllFilesOfTypeToTree(root, "Visuals", artPath, "*.vis");
-                AddAllFilesOfTypeToTree(root, "Models", artPath, "*.ugx");
+                string absolutePath = context.GetAbsoluteScratchPath(relativePath);
+                foldersInDirectory = Directory.EnumerateDirectories(absolutePath).Where(dir => DoesDirectoryHaveRelevantFiles(dir)).ToArray();
+                filesInDirectory = Directory.EnumerateFiles(absolutePath, "*.*", SearchOption.TopDirectoryOnly).Where(file => extensions.Contains(Path.GetExtension(file).ToLowerInvariant())).ToArray();
             });
 
-            BuildTreeView(root, myTreeView.Items);
-
-            lblStatus.Text = "Ready";
-            statusProgressBar.Visibility = Visibility.Hidden;
-        }
-
-        public void BuildTreeView(HWTreeFolder root, ItemCollection treeViewItems) {
-            foreach (var entry in root.FilesAndFolders) {
-                entry.CreateTreeViewItem(this);
-                treeViewItems.Add(entry.TreeViewItem);
-                if (entry is HWTreeFolder folder) {
-                    BuildTreeView(folder, entry.TreeViewItem.Items);
-                }
-            }
-        }
-
-        private void AddAllFilesOfTypeToTree(HWTreeFolder folder, string topLevelFolderName, string startIn, string searchPattern) {
-            var topLevelItem = new HWTreeFolder(topLevelFolderName, true);
-            folder.FilesAndFolders.Add(topLevelItem);
-
-            AddFilesToTreeHelper(topLevelItem, startIn, searchPattern);
-        }
-
-        private void AddFilesToTreeHelper(HWTreeFolder folder, string currentDirectory, string searchPattern) {
-            foreach (var subdir in Directory.EnumerateDirectories(currentDirectory)) {
-                if (!Directory.EnumerateFiles(subdir, searchPattern, SearchOption.AllDirectories).Any()) {
-                    continue;
-                }
-
-                var newItem = new HWTreeFolder(Path.GetRelativePath(currentDirectory, subdir), false);
-                folder.FilesAndFolders.Add(newItem);
-
-                AddFilesToTreeHelper(newItem, subdir, searchPattern);
-            }
-
-            foreach (var file in Directory.EnumerateFiles(currentDirectory, searchPattern)) {
-                var dataContext = new HWDataContext() {
-                    RelativePath = context.GetRelativeScratchPath(file),
-                    Context = context
+            collection.Clear();
+            foreach (var folder in foldersInDirectory) {
+                var treeViewItem = new TreeViewItem() {
+                    Header = CreateIconAndLabel("FolderClosed", Path.GetFileName(folder)),
+                    HorizontalContentAlignment = HorizontalAlignment.Left,
+                    VerticalContentAlignment = VerticalAlignment.Center
                 };
-                var fileItem = new HWTreeFile(Path.GetFileNameWithoutExtension(file), dataContext);
-                folder.FilesAndFolders.Add(fileItem);
+                treeViewItem.DataContext = context.GetRelativeScratchPath(folder);
+                treeViewItem.Expanded += TreeViewItem_Expanded;
+
+                collection.Add(treeViewItem);
+                treeViewItem.Items.Add(CreateLoadingTreeViewItem());
             }
+
+            foreach (var file in filesInDirectory) {
+                var treeViewItem = new TreeViewItem() {
+                    Header = CreateIconAndLabel("ThreeDScene", Path.GetFileName(file)),
+                    HorizontalContentAlignment = HorizontalAlignment.Left,
+                    VerticalContentAlignment = VerticalAlignment.Center
+                };
+                treeViewItem.DataContext = new HWDataContext(context, context.GetRelativeScratchPath(file));
+                treeViewItem.Selected += FileItem_Selected;
+                collection.Add(treeViewItem);
+            }
+
+            ResetStatus();
+        }
+
+        private void TreeViewItem_Expanded(object sender, RoutedEventArgs e) {
+            var treeViewItem = sender as TreeViewItem;
+            string relativePath = treeViewItem.DataContext as string;
+            PopulateTreeViewFolder(treeViewItem.Items, relativePath);
+            e.Handled = true;
+        }
+
+        private TreeViewItem CreateLoadingTreeViewItem() {
+            var loadingItem = new TreeViewItem() {
+                Header = CreateIconAndLabel("Hourglass", "Loading..."),
+                HorizontalContentAlignment = HorizontalAlignment.Left,
+                VerticalContentAlignment = VerticalAlignment.Center
+            };
+
+            return loadingItem;
         }
 
         public void FileItem_Selected(object sender, RoutedEventArgs e) {
             var treeViewItem = sender as TreeViewItem;
             var dataContext = treeViewItem?.DataContext as HWDataContext;
             if (dataContext != null) {
-                lblStatus.Text = "Viewing " + dataContext.RelativePath;
                 var extension = Path.GetExtension(dataContext.RelativePath);
                 myControlDockPanel.Content = extension switch {
                     ".scn" => new MapControl(dataContext),

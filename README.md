@@ -29,4 +29,5 @@ private const string imageLibraryPath = "C:\\Users\\rid3r\\Documents\\GitHub\\VS
 * Add orbit and fly camera controls
 * Add texture support (blocked by HaloWarsTools)
 * Add material/shader support (blocked by HaloWarsTools)
+* Add export options
 * Discard GL vertex buffers/shaders/textures when they're no longer needed

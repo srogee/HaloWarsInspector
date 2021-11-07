@@ -22,8 +22,6 @@ private const string imageLibraryPath = "C:\\Users\\rid3r\\Documents\\GitHub\\VS
 
 ## To-do List
 * Add simple lighting
-* Read/import resources on separate thread so process isn't locked up
-* Compile shaders on separate thread
 * Allow users to toggle visibility of different meshes/submeshes
 * Center terrain mesh in map viewer
 * Rotate meshes to match expected +X forward +Z up

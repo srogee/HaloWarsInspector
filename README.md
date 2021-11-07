@@ -13,9 +13,15 @@ Some Folder
     HaloWarsTools
     HaloWarsInspector
 ```
+* Download the [Visual Studio Image Library](https://www.microsoft.com/en-us/download/details.aspx?id=35825)
+* Edit this line to point to your image library:
+```
+private const string imageLibraryPath = "C:\\Users\\rid3r\\Documents\\GitHub\\VS2019 Image Library\\vswin2019";
+```
 * Build and run the solution
 
 ## To-do List
+* Add simple lighting
 * Read/import resources on separate thread so process isn't locked up
 * Compile shaders on separate thread
 * Allow users to toggle visibility of different meshes/submeshes

@@ -21,12 +21,12 @@ private const string imageLibraryPath = "C:\\Users\\rid3r\\Documents\\GitHub\\VS
 * Build and run the solution
 
 ## To-do List
-* Add simple lighting
-* Allow users to toggle visibility of different meshes/submeshes
-* Center terrain mesh in map viewer
 * Rotate meshes to match expected +X forward +Z up
 * Automatically set camera position based on scene bounds
+* Center terrain mesh in map viewer
+* Add simple lighting
 * Add orbit and fly camera controls
+* Allow users to toggle visibility of different meshes/submeshes
 * Add texture support (blocked by HaloWarsTools)
 * Add material/shader support (blocked by HaloWarsTools)
 * Add export options

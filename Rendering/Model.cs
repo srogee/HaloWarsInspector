@@ -105,14 +105,9 @@ namespace HaloWarsInspector.Rendering
             var indices = new List<int>();
 
             var size = new Vector2(0.25f, 1000);
-            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitX * size.Y / 2, Vector3.UnitY, Vector3.UnitX, size, true, new Vector2(0.166f, 0.5f));
-            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitX * size.Y / 2, Vector3.UnitZ, Vector3.UnitX, size, true, new Vector2(0.166f, 0.5f));
-
-            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitY * size.Y / 2, Vector3.UnitX, Vector3.UnitY, size, true, new Vector2(0.5f, 0.5f));
-            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitY * size.Y / 2, Vector3.UnitZ, Vector3.UnitY, size, true, new Vector2(0.5f, 0.5f));
-
-            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitZ * size.Y / 2, Vector3.UnitX, Vector3.UnitZ, size, true, new Vector2(0.833f, 0.5f));
-            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitZ * size.Y / 2, Vector3.UnitY, Vector3.UnitZ, size, true, new Vector2(0.833f, 0.5f));
+            DefineLine(vertices, normals, texCoords, indices, Vector3.Zero, Vector3.UnitX * size.Y, size.X, true, new Vector2(0.166f, 0.5f));
+            DefineLine(vertices, normals, texCoords, indices, Vector3.Zero, Vector3.UnitY * size.Y, size.X, true, new Vector2(0.5f, 0.5f));
+            DefineLine(vertices, normals, texCoords, indices, Vector3.Zero, Vector3.UnitZ * size.Y, size.X, true, new Vector2(0.833f, 0.5f));
 
             var model = new Model(vertices, normals, texCoords, indices, ShaderCompiler.RgbShader);
 
@@ -150,6 +145,29 @@ namespace HaloWarsInspector.Rendering
             indices.Add(startIndex);
             indices.Add(startIndex + 2);
             indices.Add(startIndex + 3);
+        }
+
+        private static void DefineLine(List<Vector3> vertices, List<Vector3> normals, List<Vector2> texCoords, List<int> indices, Vector3 start, Vector3 end, float size, bool overrideTexCoords, Vector2 texCoordOverride) {
+            var sizeVector = new Vector2(size, Vector3.Distance(start, end));
+            var center = (start + end) / 2;
+            var xAxis = Vector3.Normalize(end - start);
+            var yAxis = GetRandomTangent(xAxis);
+            DefinePlane(vertices, normals, texCoords, indices, center, yAxis, xAxis, sizeVector, overrideTexCoords, texCoordOverride);
+            DefinePlane(vertices, normals, texCoords, indices, center, Vector3.Cross(xAxis, yAxis), xAxis, sizeVector, overrideTexCoords, texCoordOverride);
+
+        }
+
+        private static Vector3 GetRandomTangent(Vector3 normal) {
+            Vector3 tangent;
+            Vector3 t1 = Vector3.Cross(normal, Vector3.UnitX);
+            Vector3 t2 = Vector3.Cross(normal, Vector3.UnitZ);
+            if (t1.Length > t2.Length) {
+                tangent = t1;
+            } else {
+                tangent = t2;
+            }
+
+            return Vector3.Normalize(tangent);
         }
     }
 }

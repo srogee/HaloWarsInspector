@@ -22,8 +22,6 @@ private const string imageLibraryPath = "C:\\Users\\rid3r\\Documents\\GitHub\\VS
 
 ## To-do List
 * Add simple lighting
-* Read/import resources on separate thread so process isn't locked up
-* Compile shaders on separate thread
 * Allow users to toggle visibility of different meshes/submeshes
 * Center terrain mesh in map viewer
 * Rotate meshes to match expected +X forward +Z up
@@ -31,4 +29,5 @@ private const string imageLibraryPath = "C:\\Users\\rid3r\\Documents\\GitHub\\VS
 * Add orbit and fly camera controls
 * Add texture support (blocked by HaloWarsTools)
 * Add material/shader support (blocked by HaloWarsTools)
+* Add export options
 * Discard GL vertex buffers/shaders/textures when they're no longer needed

@@ -29,6 +29,7 @@ namespace HaloWarsInspector
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string imageLibraryPath = "C:\\Users\\rid3r\\Documents\\GitHub\\VS2019 Image Library\\vswin2019";
         private HWContext context;
         public static MainWindow Instance;
         private HashSet<string> extensions = new HashSet<string>() { ".xtd", ".vis", ".ugx" };
@@ -148,7 +149,7 @@ namespace HaloWarsInspector
         }
 
         public static Uri GetIconPath(string iconName) {
-            return new Uri(Path.Combine("C:\\Users\\rid3r\\Documents\\GitHub\\VS2019 Image Library\\vswin2019", iconName, iconName + "_16x.png"));
+            return new Uri(Path.Combine(imageLibraryPath, iconName, iconName + "_16x.png"));
         }
 
         public static StackPanel CreateIconAndLabel(string iconName, string label) {

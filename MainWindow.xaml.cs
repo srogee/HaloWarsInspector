@@ -31,7 +31,7 @@ namespace HaloWarsInspector
     {
         private HWContext context;
         public static MainWindow Instance;
-        private HashSet<string> extensions = new HashSet<string>() { ".scn", ".vis", ".ugx" };
+        private HashSet<string> extensions = new HashSet<string>() { ".xtd", ".vis", ".ugx" };
 
         public MainWindow() {
             Instance = this;
@@ -139,7 +139,7 @@ namespace HaloWarsInspector
             if (dataContext != null) {
                 var extension = Path.GetExtension(dataContext.RelativePath);
                 myControlDockPanel.Content = extension switch {
-                    ".scn" => new MapControl(dataContext),
+                    ".xtd" => new MapControl(dataContext),
                     ".ugx" => new ModelControl(dataContext),
                     ".vis" => new VisualControl(dataContext),
                     _ => null

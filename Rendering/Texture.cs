@@ -10,7 +10,7 @@ namespace LearnOpenTK.Common
     {
         public readonly int Handle;
 
-        public static Texture LoadFromFile(string path) {
+        public static Texture FromBitmap(Bitmap bitmap) {
             // Generate handle
             int handle = GL.GenTexture();
 
@@ -21,7 +21,7 @@ namespace LearnOpenTK.Common
             // For this example, we're going to use .NET's built-in System.Drawing library to load textures.
 
             // Load the image
-            using (var image = new Bitmap(path)) {
+            using (var image = new Bitmap(bitmap)) {
                 // Our Bitmap loads from the top-left pixel, whereas OpenGL loads from the bottom-left, causing the texture to be flipped vertically.
                 // This will correct that, making the texture display properly.
                 image.RotateFlip(RotateFlipType.RotateNoneFlipY);
@@ -86,6 +86,12 @@ namespace LearnOpenTK.Common
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
             return new Texture(handle);
+        }
+
+        public static Texture FromFile(string path) {
+            using (var image = new Bitmap(path)) {
+                return FromBitmap(image);
+            }
         }
 
         public Texture(int glHandle) {

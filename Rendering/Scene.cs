@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HaloWarsTools;
+using LearnOpenTK.Common;
 using OpenTK.Mathematics;
 
 namespace HaloWarsInspector.Rendering
@@ -25,7 +26,7 @@ namespace HaloWarsInspector.Rendering
             }
         }
 
-        public static SceneNode FromGenericMesh(GenericMesh mesh) {
+        public static SceneNode FromGenericMesh(GenericMesh mesh, Shader shader = null) {
             var node = new SceneNode();
 
             GenericMeshSection[] sections = mesh.GetMeshSections();
@@ -67,7 +68,7 @@ namespace HaloWarsInspector.Rendering
                         indices.Add(indexMap[face.C]);
                     }
 
-                    var model = new Model(vertices, normals, texcoords, indices);
+                    var model = new Model(vertices, normals, texcoords, indices, shader);
                     node.Children.Add(new SceneModelNode(model));
                 }
             }

@@ -14,9 +14,7 @@ namespace HaloWarsInspector.Rendering
 
         public static Shader DefaultShader => ShaderCache.Get(() => {
             var shader = new Shader("Rendering/Shaders/shader.vert", "Rendering/Shaders/shader.frag");
-            shader.Texture = Texture.LoadFromFile("Rendering/Resources/container.png");
-            shader.Use();
-            shader.SetInt("texture0", 0); // Unsure what this does
+            shader.Texture = Texture.FromFile("Rendering/Resources/container.png");
 
             return shader;
         });

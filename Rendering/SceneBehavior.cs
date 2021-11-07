@@ -9,8 +9,9 @@ namespace HaloWarsInspector.Rendering
     {
         private GLWpfControl control;
         public SceneNode Root;
+        private float cameraDistance;
 
-        public SceneBehavior(GLWpfControl control) {
+        public SceneBehavior(GLWpfControl control, float cameraDistance = 150) {
             this.control = control;
             Root = new SceneNode();
 
@@ -19,6 +20,7 @@ namespace HaloWarsInspector.Rendering
                 MinorVersion = 6
             };
 
+            this.cameraDistance = cameraDistance;
             control.Start(settings);
         }
 
@@ -44,14 +46,14 @@ namespace HaloWarsInspector.Rendering
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             // For the view, we don't do too much here. Next tutorial will be all about a Camera class that will make it much easier to manipulate the view.
             // For now, we move it backwards three units on the Z axis.
-            var view = Matrix4.CreateTranslation(0.0f, 0.0f, -150.0f);
+            var view = Matrix4.CreateTranslation(0.0f, 0.0f, -cameraDistance);
 
             // For the matrix, we use a few parameters.
             //   Field of view. This determines how much the viewport can see at once. 45 is considered the most "realistic" setting, but most video games nowadays use 90
             //   Aspect ratio. This should be set to Width / Height.
             //   Near-clipping. Any vertices closer to the camera than this value will be clipped.
             //   Far-clipping. Any vertices farther away from the camera than this value will be clipped.
-            var projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), (float)control.RenderSize.Width / (float)control.RenderSize.Height, 0.1f, 1000.0f);
+            var projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), (float)control.RenderSize.Width / (float)control.RenderSize.Height, 1f, 10000);
 
             if (Root != null) {
                 Root.Matrix = Matrix4.Identity * Matrix4.CreateRotationX((float)MathHelper.DegreesToRadians(_time));

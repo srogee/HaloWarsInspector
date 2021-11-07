@@ -16,8 +16,9 @@ namespace HaloWarsInspector.Rendering
         private int _vertexBufferObject;
         private int _vertexArrayObject;
         private int indicesLength;
+        private Shader shader;
 
-        public Model(List<Vector3> vertices, List<Vector3> normals, List<Vector2> texCoords, IEnumerable<int> indices) {
+        public Model(List<Vector3> vertices, List<Vector3> normals, List<Vector2> texCoords, IEnumerable<int> indices, Shader shader) {
             var data = new List<float>();
             
             for (int i = 0; i < vertices.Count; i++) {
@@ -34,7 +35,7 @@ namespace HaloWarsInspector.Rendering
             }
 
             var uintIndices = indices.Select(index => (uint)index);
-
+            this.shader = shader ?? ShaderCompiler.DefaultShader;
             Initialize(data.ToArray(), uintIndices.ToArray());
         }
 
@@ -56,7 +57,6 @@ namespace HaloWarsInspector.Rendering
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
 
-            var shader = ShaderCompiler.DefaultShader;
             shader.Use();
 
             var positionLocation = shader.GetAttribLocation("aPosition");
@@ -86,7 +86,6 @@ namespace HaloWarsInspector.Rendering
             // If you pass the individual matrices to the shader and multiply there, you have to do in the order "model * view * projection".
             // You can think like this: first apply the modelToWorld (aka model) matrix, then apply the worldToView (aka view) matrix, 
             // and finally apply the viewToProjectedSpace (aka projection) matrix.
-            var shader = ShaderCompiler.DefaultShader;
             shader.Use();
             shader.SetMatrix4("model", model);
             shader.SetMatrix4("view", view);

@@ -11,6 +11,7 @@ using OpenTK.Graphics.OpenGL4;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Windows.Threading;
 
 namespace HaloWarsInspector
 {
@@ -38,6 +39,10 @@ namespace HaloWarsInspector
             Instance = this;
             InitializeComponent();
             Initialize();
+        }
+
+        public async Task GiveApplicationAChanceToRender() {
+            await Dispatcher.Yield(DispatcherPriority.Render);
         }
 
         public void SetStatus(string label) {

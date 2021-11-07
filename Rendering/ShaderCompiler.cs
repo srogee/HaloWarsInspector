@@ -18,5 +18,12 @@ namespace HaloWarsInspector.Rendering
 
             return shader;
         });
+
+        public static Shader RgbShader => ShaderCache.Get(() => {
+            var shader = new Shader("Rendering/Shaders/shader.vert", "Rendering/Shaders/shader.frag");
+            shader.Texture = Texture.FromFile("Rendering/Resources/rgb.png");
+
+            return shader;
+        });
     }
 }

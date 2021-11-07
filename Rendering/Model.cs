@@ -12,13 +12,17 @@ namespace HaloWarsInspector.Rendering
 {
     public class Model
     {
+        private static LazyValueCache ModelCache = new LazyValueCache();
+
+        public static Model CoordinateHelper => ModelCache.Get(CreateCoordinateHelper);
+
         private int _elementBufferObject;
         private int _vertexBufferObject;
         private int _vertexArrayObject;
         private int indicesLength;
         private Shader shader;
 
-        public Model(List<Vector3> vertices, List<Vector3> normals, List<Vector2> texCoords, IEnumerable<int> indices, Shader shader) {
+        public Model(List<Vector3> vertices, List<Vector3> normals, List<Vector2> texCoords, List<int> indices, Shader shader) {
             var data = new List<float>();
             
             for (int i = 0; i < vertices.Count; i++) {
@@ -92,6 +96,60 @@ namespace HaloWarsInspector.Rendering
             shader.SetMatrix4("projection", projection);
 
             GL.DrawElements(PrimitiveType.Triangles, indicesLength, DrawElementsType.UnsignedInt, 0);
+        }
+
+        private static Model CreateCoordinateHelper() {
+            var vertices = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var texCoords = new List<Vector2>();
+            var indices = new List<int>();
+
+            var size = new Vector2(0.25f, 1000);
+            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitX * size.Y / 2, Vector3.UnitY, Vector3.UnitX, size, true, new Vector2(0.166f, 0.5f));
+            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitX * size.Y / 2, Vector3.UnitZ, Vector3.UnitX, size, true, new Vector2(0.166f, 0.5f));
+
+            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitY * size.Y / 2, Vector3.UnitX, Vector3.UnitY, size, true, new Vector2(0.5f, 0.5f));
+            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitY * size.Y / 2, Vector3.UnitZ, Vector3.UnitY, size, true, new Vector2(0.5f, 0.5f));
+
+            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitZ * size.Y / 2, Vector3.UnitX, Vector3.UnitZ, size, true, new Vector2(0.833f, 0.5f));
+            DefinePlane(vertices, normals, texCoords, indices, Vector3.UnitZ * size.Y / 2, Vector3.UnitY, Vector3.UnitZ, size, true, new Vector2(0.833f, 0.5f));
+
+            var model = new Model(vertices, normals, texCoords, indices, ShaderCompiler.RgbShader);
+
+            return model;
+        }
+
+        private static void DefinePlane(List<Vector3> vertices, List<Vector3> normals, List<Vector2> texCoords, List<int> indices, Vector3 center, Vector3 xAxis, Vector3 yAxis, Vector2 size, bool overrideTexCoords, Vector2 texCoordOverride) {
+            var startIndex = vertices.Count;
+            vertices.Add(center - (xAxis * size.X / 2) - (yAxis * size.Y / 2));
+            vertices.Add(center + (xAxis * size.X / 2) - (yAxis * size.Y / 2));
+            vertices.Add(center + (xAxis * size.X / 2) + (yAxis * size.Y / 2));
+            vertices.Add(center - (xAxis * size.X / 2) + (yAxis * size.Y / 2));
+            
+            var normal = Vector3.Cross(xAxis, yAxis);
+            normals.Add(normal);
+            normals.Add(normal);
+            normals.Add(normal);
+            normals.Add(normal);
+
+            if (overrideTexCoords) {
+                texCoords.Add(texCoordOverride);
+                texCoords.Add(texCoordOverride);
+                texCoords.Add(texCoordOverride);
+                texCoords.Add(texCoordOverride);
+            } else {
+                texCoords.Add(new Vector2(0, 0));
+                texCoords.Add(new Vector2(1, 0));
+                texCoords.Add(new Vector2(1, 1));
+                texCoords.Add(new Vector2(0, 1));
+            }
+
+            indices.Add(startIndex);
+            indices.Add(startIndex + 1);
+            indices.Add(startIndex + 2);
+            indices.Add(startIndex);
+            indices.Add(startIndex + 2);
+            indices.Add(startIndex + 3);
         }
     }
 }

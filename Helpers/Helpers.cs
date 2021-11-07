@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
+using OpenTK.Graphics.OpenGL4;
 
 namespace HaloWarsInspector
 {

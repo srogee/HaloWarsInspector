@@ -46,7 +46,7 @@ namespace HaloWarsInspector.Rendering
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             // For the view, we don't do too much here. Next tutorial will be all about a Camera class that will make it much easier to manipulate the view.
             // For now, we move it backwards three units on the Z axis.
-            var view = Matrix4.CreateTranslation(0.0f, 0.0f, -cameraDistance);
+            var view = Matrix4.CreateTranslation(0.0f, 0.0f, -cameraDistance); // this is actually opposite the camera's position
 
             // For the matrix, we use a few parameters.
             //   Field of view. This determines how much the viewport can see at once. 45 is considered the most "realistic" setting, but most video games nowadays use 90
@@ -55,8 +55,11 @@ namespace HaloWarsInspector.Rendering
             //   Far-clipping. Any vertices farther away from the camera than this value will be clipped.
             var projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), (float)control.RenderSize.Width / (float)control.RenderSize.Height, 1f, 10000);
 
+            var mat = Matrix4.Identity * Matrix4.CreateRotationX((float)MathHelper.DegreesToRadians(_time)) * Matrix4.CreateRotationZ((float)MathHelper.DegreesToRadians(_time * 0.5f));
+
+            Model.CoordinateHelper.Draw(mat, view, projection);
             if (Root != null) {
-                Root.Matrix = Matrix4.Identity * Matrix4.CreateRotationX((float)MathHelper.DegreesToRadians(_time));
+                Root.Matrix = mat;
                 Root.Draw(view, projection);
             }
         }

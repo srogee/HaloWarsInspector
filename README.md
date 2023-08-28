@@ -1,6 +1,6 @@
 # HaloWarsInspector
 
-Simple Halo Wars Definitive Edition map/model viewer built on top of my [HaloWarsTools](https://github.com/srogee/HaloWarsTools) project (which is currently private). Very barebones at the moment (no camera rotation, models are rotated wrong, etc).
+Simple Halo Wars Definitive Edition map/model viewer built on top of my [HaloWarsTools](https://github.com/srogee/HaloWarsTools) project. Very barebones at the moment (no camera rotation, models are rotated wrong, etc).
 
 ![Preview](https://raw.githubusercontent.com/srogee/HaloWarsInspector/main/preview.png)
 
